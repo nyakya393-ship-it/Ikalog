@@ -374,9 +374,14 @@ function deleteBattle(index){
 
     renderBattleList();
 
-    renderAnalysis();
+renderAnalysis();
 
-    showToast("削除しました");
+localStorage.setItem(
+    "battles",
+    JSON.stringify(battles)
+);
+
+showToast("削除しました");
 
 }
 
@@ -470,7 +475,12 @@ function renderAnalysis(){
         戦績がありません
         </div>
         `;
+document.getElementById("weaponRanking").innerHTML="";
+document.getElementById("stageRanking").innerHTML="";
+document.getElementById("ruleRanking").innerHTML="";
+document.getElementById("battleTypeRanking").innerHTML="";
 
+drawWinChart();
         return;
 
     }
@@ -589,7 +599,19 @@ function renderAnalysis(){
     renderStageRanking();
     renderRuleRanking();
     renderBattleTypeRanking();
+summary.innerHTML += `
 
+<br><hr><br>
+
+<b>プレイスタイル</b><br>
+${playerStyle()}<br><br>
+
+<b>現在ランク</b><br>
+${playerRank()}<br>
+
+`;
+
+drawWinChart();
 }
 
 /*==============================
@@ -895,35 +917,7 @@ function playerRank(){
 
 }
 
-/*==============================
-  renderAnalysis追加
-==============================*/
 
-const oldRenderAnalysis=renderAnalysis;
-
-renderAnalysis=function(){
-
-    oldRenderAnalysis();
-
-    const summary=document.getElementById("summary");
-
-    summary.innerHTML+=`
-
-    <br><hr><br>
-
-    <b>プレイスタイル</b><br>
-
-    ${playerStyle()}<br><br>
-
-    <b>現在ランク</b><br>
-
-    ${playerRank()}<br>
-
-    `;
-
-    drawWinChart();
-
-};
 /*==============================
   武器詳細分析
 ==============================*/
