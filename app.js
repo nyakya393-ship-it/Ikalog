@@ -698,9 +698,21 @@ function renderBattleTypeRanking(){
 
 function ranking(key,id){
 
+    const box=document.getElementById(id);
+
+    if(!box) return;
+
+    // 毎回完全リセット
+    box.replaceChildren();
+
     const map={};
 
     battles.forEach(b=>{
+
+        // 通信切断・無効試合はランキング対象外
+        if(b.result!=="win" && b.result!=="lose"){
+            return;
+        }
 
         if(!map[b[key]]){
 
@@ -713,59 +725,47 @@ function ranking(key,id){
 
         map[b[key]].total++;
 
-        if(b.result==="win")
+        if(b.result==="win"){
             map[b[key]].win++;
+        }
 
     });
 
-    const box=document.getElementById(id);
+    const list=Object.entries(map);
 
-    if(!box) return;
+    if(list.length===0){
+        box.innerHTML="<div class='rankItem'>データなし</div>";
+        return;
+    }
 
-    box.innerHTML="";
+    list.sort((a,b)=>{
 
-    Object.entries(map)
+        const rateA=a[1].win/a[1].total;
+        const rateB=b[1].win/b[1].total;
 
-    .sort((a,b)=>
+        if(rateB!==rateA){
+            return rateB-rateA;
+        }
 
-        (b[1].win/b[1].total)-
-        (a[1].win/a[1].total)
+        return b[1].total-a[1].total;
 
-    )
+    });
 
-    .forEach(item=>{
+    list.forEach(([name,data],i)=>{
 
-        const rate=
-        item[1].total
-        ?
-        (
-        item[1].win/
-        item[1].total*
-        100
-        ).toFixed(1)
-        :
-        0;
+        const rate=(data.win/data.total*100).toFixed(1);
 
         box.innerHTML+=`
-
         <div class="rankItem">
-
             <span class="rankName">
-
-            ${item[0]}
-
+                ${i+1}. ${name}
             </span>
 
             <span class="rankRate">
-
-            ${rate}%
-
+                ${rate}% (${data.win}/${data.total})
             </span>
-
         </div>
-
         `;
-
     });
 
 }
